@@ -39,22 +39,72 @@ if ("IntersectionObserver" in window) {
 
 const lightbox = document.createElement("div");
 lightbox.className = "image-lightbox";
-lightbox.innerHTML = '<img alt="Expanded project screenshot">';
+lightbox.innerHTML = `
+  <button class="lightbox-control prev" type="button" aria-label="Previous fullscreen screenshot"></button>
+  <img alt="Expanded project screenshot">
+  <button class="lightbox-control next" type="button" aria-label="Next fullscreen screenshot"></button>
+`;
 document.body.appendChild(lightbox);
 
 const lightboxImage = lightbox.querySelector("img");
+const lightboxPrev = lightbox.querySelector(".lightbox-control.prev");
+const lightboxNext = lightbox.querySelector(".lightbox-control.next");
+let lightboxSlides = [];
+let lightboxIndex = 0;
+let lightboxSyncSlide = null;
+
+const showLightboxImage = (index) => {
+  if (!lightboxSlides.length) {
+    return;
+  }
+
+  lightboxIndex = (index + lightboxSlides.length) % lightboxSlides.length;
+  const image = lightboxSlides[lightboxIndex];
+  lightboxImage.src = image.currentSrc || image.src;
+  lightboxImage.alt = image.alt;
+
+  if (lightboxSyncSlide) {
+    lightboxSyncSlide(lightboxIndex);
+  }
+};
+
 const closeLightbox = () => {
   lightbox.classList.remove("open");
   document.body.classList.remove("lightbox-open");
   lightboxImage.removeAttribute("src");
   lightboxImage.alt = "Expanded project screenshot";
+  lightboxSlides = [];
+  lightboxIndex = 0;
+  lightboxSyncSlide = null;
 };
 
 lightbox.addEventListener("click", closeLightbox);
 
+lightboxPrev.addEventListener("click", (event) => {
+  event.stopPropagation();
+  showLightboxImage(lightboxIndex - 1);
+});
+
+lightboxNext.addEventListener("click", (event) => {
+  event.stopPropagation();
+  showLightboxImage(lightboxIndex + 1);
+});
+
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && lightbox.classList.contains("open")) {
+  if (!lightbox.classList.contains("open")) {
+    return;
+  }
+
+  if (event.key === "Escape") {
     closeLightbox();
+  }
+
+  if (event.key === "ArrowLeft") {
+    showLightboxImage(lightboxIndex - 1);
+  }
+
+  if (event.key === "ArrowRight") {
+    showLightboxImage(lightboxIndex + 1);
   }
 });
 
@@ -92,14 +142,13 @@ document.querySelectorAll("[data-slider]").forEach((slider) => {
     });
   });
 
-  slides.forEach((slide) => {
+  slides.forEach((slide, slideIndex) => {
     slide.addEventListener("click", () => {
-      const image = slide.querySelector("img");
-      if (!image) {
-        return;
-      }
-      lightboxImage.src = image.currentSrc || image.src;
-      lightboxImage.alt = image.alt;
+      lightboxSlides = slides
+        .map((projectSlide) => projectSlide.querySelector("img"))
+        .filter(Boolean);
+      lightboxSyncSlide = showSlide;
+      showLightboxImage(slideIndex);
       lightbox.classList.add("open");
       document.body.classList.add("lightbox-open");
     });
