@@ -294,15 +294,18 @@
 
 .project-more {
   display: grid;
-  min-height: 260px;
+  min-height: 318px;
   place-items: center;
+  align-self: stretch;
+  text-align: center;
 }
 
 .project-more span {
   color: var(--text);
-  font-size: 1.35rem;
+  font-size: clamp(2rem, 2.6vw, 3.2rem);
   font-weight: 900;
-  letter-spacing: -.04em;
+  line-height: 1;
+  letter-spacing: -.07em;
 }
 
 .image-lightbox {
@@ -314,6 +317,7 @@
   padding: 28px;
   background: rgba(0,0,0,.88);
   cursor: zoom-out;
+  --lightbox-image-width: min(96vw, 1600px);
 }
 
 .image-lightbox.open {
@@ -321,7 +325,7 @@
 }
 
 .image-lightbox img {
-  max-width: min(96vw, 1600px);
+  max-width: var(--lightbox-image-width);
   max-height: 94vh;
   object-fit: contain;
   border-radius: 14px;
@@ -332,28 +336,29 @@
   position: fixed;
   top: 50%;
   z-index: 101;
-  width: 64px;
-  height: 86px;
+  width: 72px;
+  height: 96px;
   border: 0;
   border-radius: 999px;
-  background: rgba(8, 11, 18, .34) url("images/slider-arrow.png") center / 34px 46px no-repeat;
+  background: rgba(8, 11, 18, .74) url("images/slider-arrow.png") center / 38px 52px no-repeat;
+  box-shadow: 0 18px 46px rgba(0,0,0,.45);
   cursor: pointer;
-  opacity: .88;
+  opacity: .96;
   transform: translateY(-50%);
 }
 
 .lightbox-control:hover {
   opacity: 1;
-  background-color: rgba(8, 11, 18, .58);
+  background-color: rgba(8, 11, 18, .9);
 }
 
 .lightbox-control.prev {
-  left: clamp(14px, 4vw, 72px);
+  left: max(18px, calc((100vw - var(--lightbox-image-width)) / 2 + 18px));
   transform: translateY(-50%) rotate(180deg);
 }
 
 .lightbox-control.next {
-  right: clamp(14px, 4vw, 72px);
+  right: max(18px, calc((100vw - var(--lightbox-image-width)) / 2 + 18px));
 }
 
 body.lightbox-open {
@@ -382,8 +387,8 @@ body.lightbox-open {
   }
 
   .lightbox-control {
-    width: 44px;
-    height: 62px;
-    background-size: 24px 34px;
+    width: 52px;
+    height: 72px;
+    background-size: 28px 38px;
   }
 }
